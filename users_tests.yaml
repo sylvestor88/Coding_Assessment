@@ -1,0 +1,173 @@
+---
+- config:
+    - testset: "User tests"
+
+- test:
+    - group: "URL Check"
+    - name: "Checking URL"
+    - url: "/users"
+
+- test:
+    - group: "GET"
+    - name: "Get list of users when no user exists"
+    - url: "/users"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "users", comparator: "length_eq", expected: 0}
+
+- test:
+    - group: "GET"
+    - name: "Get for non-existant user"
+    - url: "/users/admins"
+    - method: "GET"
+    - expected_status: [404]
+
+- test:
+    - group: "POST"
+    - name: "Create a new user with empty json"
+    - url: "/users"
+    - method: "POST"
+    - body: '{}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "POST"
+    - name: "Create a new user with no userid attribute"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "groups": ["admins", "users"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "POST"
+    - name: "Create a new user with no groups attribute"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "userid": "jsmith"}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "POST"
+    - name: "Create a new user with non-existant group in groups attribute"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "userid": "jsmith", "groups": ["admins"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "POST"
+    - name: "Create a new user with empty groups attribute"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "userid": "jsmith", "groups": []}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "POST"
+    - name: "Create a new group"
+    - url: "/groups"
+    - method: "POST"
+    - body: '{"name": "admins"}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [201]
+
+- test:
+    - group: "POST"
+    - name: "Create a new user"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "userid": "jsmith", "groups": ["admins"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [201]
+
+- test:
+    - group: "GET"
+    - name: "Get users"
+    - url: "/users"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "users", comparator: "length_eq", expected: 1}
+
+- test:
+    - group: "POST"
+    - name: "Create a new user"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Sylvestor", "last_name": "George", "userid": "silvy88", "groups": ["admins"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [201]
+
+- test:
+    - group: "GET"
+    - name: "Get users"
+    - url: "/users"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "users", comparator: "length_eq", expected: 2}
+
+- test:
+    - group: "POST"
+    - name: "Create a user with already existing userid"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "userid": "jsmith", "groups": ["admins"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [422]
+
+- test:
+    - group: "PUT"
+    - name: "Edit non-existant user"
+    - url: "/users/silvy"
+    - method: "PUT"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "groups": ["admins"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [404]
+
+- test:
+    - group: "PUT"
+    - name: "Edit user with wrong request format"
+    - url: "/users/jsmith"
+    - method: "PUT"
+    - body: '{}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "PUT"
+    - name: "Edit user with wrong groups format"
+    - url: "/users/jsmith"
+    - method: "PUT"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "groups": ""}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "DELETE"
+    - name: "Delete non-existant user"
+    - url: "/users/silvy"
+    - method: "DELETE"
+    - expected_status: [404]
+
+- test:
+    - group: "DELETE"
+    - name: "Delete non-existant user"
+    - url: "/users/jsmith"
+    - method: "DELETE"
+    - expected_status: [200]
+
+- test:
+    - group: "GET"
+    - name: "Get users"
+    - url: "/users"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "users", comparator: "length_eq", expected: 1}

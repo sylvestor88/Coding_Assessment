@@ -1,0 +1,221 @@
+---
+- config:
+    - testset: "Group tests"
+
+- test:
+    - group: "URL Check"
+    - name: "Checking URL"
+    - url: "/groups"
+
+- test:
+    - group: "GET"
+    - name: "Get list of groups with when no group exists"
+    - url: "/groups"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "groups", comparator: "length_eq", expected: 0}
+
+- test:
+    - group: "GET"
+    - name: "Get for non-existant group"
+    - url: "/groups/admins"
+    - method: "GET"
+    - expected_status: [404]
+
+- test:
+    - group: "POST"
+    - name: "Create a group with no name"
+    - url: "/groups"
+    - method: "POST"
+    - body: '{"name": ""}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "POST"
+    - name: "Create a group with empty body"
+    - url: "/groups"
+    - method: "POST"
+    - body: '{}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "POST"
+    - name: "Create a group without name attribute"
+    - url: "/groups"
+    - method: "POST"
+    - body: '{"gname": "admins"}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "POST"
+    - name: "Create a new group"
+    - url: "/groups"
+    - method: "POST"
+    - body: '{"name": "admins"}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [201]
+
+- test:
+    - group: "GET"
+    - name: "Get list of groups"
+    - url: "/groups"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "groups", comparator: "length_eq", expected: 1}
+        - compare: {jsonpath_mini: "groups", comparator: "contains", expected: "admins"}
+
+- test:
+    - group: "POST"
+    - name: "Create a already existing group"
+    - url: "/groups"
+    - method: "POST"
+    - body: '{"name": "admins"}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [422]
+
+- test:
+    - group: "POST"
+    - name: "Create a new group"
+    - url: "/groups"
+    - method: "POST"
+    - body: '{"name": "users"}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [201]
+
+- test:
+    - group: "GET"
+    - name: "Get list of groups"
+    - url: "/groups"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "groups", comparator: "length_eq", expected: 2}
+        - compare: {jsonpath_mini: "groups", comparator: "contains", expected: "users"}
+
+- test:
+    - group: "GET"
+    - name: "Get list of users for specific group"
+    - url: "/groups/admins"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "users", comparator: "length_eq", expected: 0}
+
+- test:
+    - group: "POST"
+    - name: "Create a new user"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Joe", "last_name": "Smith", "userid": "jsmith", "groups": ["admins", "users"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [201]
+
+- test:
+    - group: "POST"
+    - name: "Create a new user"
+    - url: "/users"
+    - method: "POST"
+    - body: '{"first_name": "Sylvestor", "last_name": "George", "userid": "silvy88", "groups": ["admins"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [201]
+
+- test:
+    - group: "GET"
+    - name: "Get list of users in specific group"
+    - url: "/groups/admins"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "users", comparator: "length_eq", expected: 2}
+
+- test:
+    - group: "GET"
+    - name: "Get list of users in specific group"
+    - url: "/groups/users"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "users", comparator: "length_eq", expected: 1}
+
+- test:
+    - group: "PUT"
+    - name: "Edit membership for non-existant group"
+    - url: "/groups/users1"
+    - method: "PUT"
+    - body: '{"members": ["silvy88"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [404]
+
+- test:
+    - group: "PUT"
+    - name: "Edit membership with no body"
+    - url: "/groups/users"
+    - method: "PUT"
+    - body: '{}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "PUT"
+    - name: "Edit membership with no members attribute"
+    - url: "/groups/users"
+    - method: "PUT"
+    - body: '{"users": ["silvy88"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "PUT"
+    - name: "Edit membership with empty users list"
+    - url: "/groups/users"
+    - method: "PUT"
+    - body: '{"members": []}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [400]
+
+- test:
+    - group: "PUT"
+    - name: "Edit membership of users"
+    - url: "/groups/users"
+    - method: "PUT"
+    - body: '{"members": ["silvy88"]}'
+    - headers: {'Content-Type': 'application/json'}
+    - expected_status: [200]
+
+- test:
+    - group: "GET"
+    - name: "Get list of users in specific group"
+    - url: "/groups/users"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "users", comparator: "length_eq", expected: 2}
+
+- test:
+    - group: "DELETE"
+    - name: "Delete non-existant Group"
+    - url: "/groups/user1"
+    - method: "Delete"
+    - expected_status: [404]
+
+- test:
+    - group: "DELETE"
+    - name: "Delete Group"
+    - url: "/groups/users"
+    - method: "Delete"
+    - expected_status: [200]
+
+- test:
+    - group: "GET"
+    - name: "Get list of groups"
+    - url: "/groups"
+    - method: "GET"
+    - expected_status: [200]
+    - validators:
+        - compare: {jsonpath_mini: "groups", comparator: "length_eq", expected: 1}
+        - compare: {jsonpath_mini: "groups", comparator: "contains", expected: "admins"}
