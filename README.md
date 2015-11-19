@@ -23,7 +23,7 @@ For running tests, you'll need to install pyresttest module:
 $ sudo pip install pyresttest
 ```
 
-There exists two different test files, one for 'users' and other for 'groups'. In order for all tests to pass, you'll have to restart the application for before running either tests as it's an in memory implementation.
+There exists two different test files, one for 'users' and other for 'groups'. For all tests to pass, you'll have to restart the application before running either tests as it's an in memory implementation.
 
 The run a test:
 ```sh
