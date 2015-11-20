@@ -33,7 +33,7 @@ $ sudo pip install pyresttest
 
 There exists two different test files, one for 'users' and other for 'groups'. For all tests to pass, you'll have to restart the application before running either tests as it's an in memory implementation.
 
-The run a test:
+To run a test:
 ```sh
 $ pyresttest http://localhost:5000 users_tests.yaml
 ```
